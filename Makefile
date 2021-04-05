@@ -1,31 +1,47 @@
 export PYTHONPATH = .
 
 test:
-	python3 -m unittest lib/test_*.py
+	python3 -m unittest game/test_*.py
 
-solutions:
-	python3 example/solutions.py
+all: assets/solutions.gif assets/steps.gif assets/pbox.svg assets/sbox.svg challenge/hello
 
-hello: hello.cpp
-	gcc hello.cpp -o hello
+solution:
+	@tools/magic.py 'Hello, World!' | tools/forward.py
 
-say-hello: hello
-	./hello
+perftest-level3:
+	@pypy3 tools/reverse.py 8192 ZGlzdGluZ3Vpc2hl perftest > /dev/null
+	@pypy3 tools/reverse.py 8192 ZCBub3Qgb25seSBi perftest > /dev/null
+	@pypy3 tools/reverse.py 8192 eSByZWFzb24gYnV0 perftest > /dev/null
+	@pypy3 tools/reverse.py 8192 IGJ5IHBhc3Npb24= perftest > /dev/null
 
-pbox/graph.svg:
-	python3 pbox/graph.py > pbox/graph.dot
-	dot -T svg -o pbox/graph.svg pbox/graph.dot
+assets/solutions.txt:
+	tools/reverse.py 800 'Hello, World!!!!' > assets/solutions.txt
 
-animation/forward.gif:
-	python3 animation/frames.py | ./animation/ppmtogif.sh
-	gifsicle --optimize --loop --scale 2 build/*.gif > animation/forward.gif
+assets/solutions.gif: assets/solutions.txt
+	@#tools/animate-solutions.py < assets/solutions.txt > assets/solutions.gif
+	tools/animate-solutions.py < assets/solutions.txt | convert - -scale 200%% -strip assets/solutions.gif
+
+assets/steps.gif:
+	@#tools/magic.py "Hello, World!" | tools/animate-steps.py > assets/steps.gif
+	tools/magic.py 'Hello, World!' | tools/animate-steps.py | convert - -scale 200%% -strip assets/steps.gif
+
+assets/pbox.dot:
+	tools/pbox.py > assets/pbox.dot
+assets/sbox.dot:
+	tools/sbox.py > assets/sbox.dot
+
+assets/pbox.svg: assets/pbox.dot
+	dot -T svg < assets/pbox.dot > assets/pbox.svg
+assets/sbox.svg: assets/sbox.dot
+	dot -T svg < assets/sbox.dot > assets/sbox.svg
 
 unroll:
-	python3 pbox/unroll.py
-	python3 sbox/unroll.py
-	python3 mixer/unroll.py
+	tools/unroll.py
+
+challenge/hello: challenge/hello.cpp
+	cd challenge; clang hello.cpp -o hello
 
 clean:
-	@rm -rf lib/__pycache__
-	@rm -rf build
-	@rm -f hello
+	@rm -rf game/__pycache__ tools/__pycache__
+	@rm -f assets/solutions.txt assets/solutions.gif assets/steps.gif assets/pbox.dot assets/pbox.svg assets/sbox.dot assets/sbox.svg
+	@rm -f challenge/hello
