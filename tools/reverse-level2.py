@@ -5,7 +5,7 @@ from game import ngame, nreverse
 def usage():
     message = """
     Generate a game solution to stdout.
-    Example usage: magic.py 'Hello there!'
+    Example usage: reverse-level2.py 'Game of riddles'
     """
     print(message, file=sys.stderr)
     sys.exit(1)

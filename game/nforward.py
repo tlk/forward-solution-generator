@@ -35,4 +35,4 @@ def forward(c, rounds=256):
 
     mixed = mix(c)
 
-    return "".join([chr(letter) for letter in mixed])
+    return "".join(chr(letter) for letter in mixed)
